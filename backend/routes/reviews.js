@@ -3,6 +3,7 @@ const router = express.Router();
 const Review = require('../models/Review');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const Restaurant = require('../models/Restaurant');
 
 // POST /api/reviews - Create a review
 router.post('/', auth, async (req, res) => {
@@ -10,8 +11,8 @@ router.post('/', auth, async (req, res) => {
         const { restaurantId, productId, rating, comment } = req.body;
 
         // Validate restaurant exists
-        const restaurant = await User.findById(restaurantId);
-        if (!restaurant || restaurant.role !== 'restaurant') {
+        const restaurant = await Restaurant.findById(restaurantId);
+        if (!restaurant) {
             return res.status(404).json({ message: 'Restaurant not found' });
         }
 
@@ -39,8 +40,8 @@ router.post('/', auth, async (req, res) => {
         ]);
 
         if (stats.length > 0) {
-            restaurant.restaurantDetails.rating = Math.round(stats[0].avgRating * 10) / 10;
-            restaurant.restaurantDetails.totalReviews = stats[0].count;
+            restaurant.rating = Math.round(stats[0].avgRating * 10) / 10;
+            restaurant.totalReviews = stats[0].count;
             await restaurant.save();
         }
 

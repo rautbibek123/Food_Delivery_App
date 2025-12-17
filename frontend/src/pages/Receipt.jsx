@@ -127,7 +127,7 @@ const Receipt = () => {
             <div className="receipt bg-white rounded-lg shadow-lg p-8">
                 {/* Header */}
                 <div className="text-center border-b-2 border-orange-600 pb-6 mb-8">
-                    <h1 className="text-4xl font-bold text-orange-600 mb-2">FoodMandu AI</h1>
+                    <h1 className="text-4xl font-bold text-orange-600 mb-2">NepEats</h1>
                     <p className="text-gray-600 text-lg">Order Receipt</p>
                 </div>
 

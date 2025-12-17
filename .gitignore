@@ -7,7 +7,7 @@
 
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json should be committed
 
 # Build outputs
 dist/
@@ -28,6 +28,7 @@ Thumbs.db
 # Uploads (user-generated content)
 backend/uploads/*
 !backend/uploads/.gitkeep
+frontend/public/uploads/*
 
 # Test files
 test-sms.js
@@ -36,3 +37,5 @@ seed_output.txt
 # Misc
 *.bak
 *.tmp
+screenshots/
+brain/

@@ -78,6 +78,7 @@ router.get('/orders', auth, adminAuth, async (req, res) => {
         const orders = await Order.find()
             .sort({ createdAt: -1 })
             .populate('userId', 'name email')
+            .populate('restaurantId', 'restaurantName address')
             .populate('items.productId', 'name price');
         res.json(orders);
     } catch (err) {

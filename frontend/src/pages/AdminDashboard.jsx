@@ -99,8 +99,8 @@ const AdminDashboard = () => {
     const restaurantMap = useMemo(() => {
         const map = {};
         restaurants.forEach(r => {
-            if (r.restaurantDetails?.restaurantName) {
-                map[r._id] = r.restaurantDetails.restaurantName;
+            if (r.restaurantName) {
+                map[r._id] = r.restaurantName;
             }
         });
         return map;
@@ -817,14 +817,20 @@ const AdminDashboard = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant ID</label>
-                                                    <input
-                                                        type="text"
-                                                        value={editingProduct.restaurantId || ''}
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant</label>
+                                                    <select
+                                                        value={editingProduct.restaurantId ? (typeof editingProduct.restaurantId === 'object' ? editingProduct.restaurantId._id : editingProduct.restaurantId) : ''}
                                                         onChange={e => setEditingProduct({ ...editingProduct, restaurantId: e.target.value })}
                                                         className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                                        placeholder="e.g., res_nepal_1"
-                                                    />
+                                                        required
+                                                    >
+                                                        <option value="">Select Restaurant</option>
+                                                        {restaurants.map(r => (
+                                                            <option key={r._id} value={r._id}>
+                                                                {r.restaurantName || 'Unnamed'}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
@@ -909,6 +915,22 @@ const AdminDashboard = () => {
                             <form onSubmit={handleCreateProduct} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* ... same form as before ... */}
                                 <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant</label>
+                                        <select
+                                            value={newProduct.restaurantId}
+                                            onChange={e => setNewProduct({ ...newProduct, restaurantId: e.target.value })}
+                                            className="w-full p-2 border rounded-lg"
+                                            required
+                                        >
+                                            <option value="">Select Restaurant</option>
+                                            {restaurants.map(r => (
+                                                <option key={r._id} value={r._id}>
+                                                    {r.restaurantName || 'Unnamed'}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                                         <input type="text" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="w-full p-2 border rounded-lg" required />
@@ -1066,7 +1088,7 @@ const AdminDashboard = () => {
                                                     </td>
                                                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.userId?.name || 'Unknown'}</td>
                                                     <td className="px-6 py-4 text-sm text-gray-600">
-                                                        {restaurantMap[order.restaurantId] || 'Unknown'}
+                                                        {order.restaurantId?.restaurantName || 'Unknown'}
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-600">NPR {order.total}</td>
                                                     <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
@@ -1124,7 +1146,13 @@ const AdminDashboard = () => {
                                                                     <h4 className="font-semibold text-gray-900 mb-2">Delivery Information</h4>
                                                                     <div className="bg-white p-3 rounded space-y-1">
                                                                         <p className="text-gray-700">
-                                                                            <span className="font-medium">Address:</span> {order.deliveryAddress || 'Not provided'}
+                                                                            <span className="font-medium">Address:</span> {
+                                                                                order.deliveryAddress ? (
+                                                                                    typeof order.deliveryAddress === 'string'
+                                                                                        ? order.deliveryAddress
+                                                                                        : `${order.deliveryAddress.street || ''}, ${order.deliveryAddress.area || ''}, ${order.deliveryAddress.city || ''}`
+                                                                                ) : 'Not provided'
+                                                                            }
                                                                         </p>
                                                                         <p className="text-gray-700">
                                                                             <span className="font-medium">Payment:</span> {order.paymentMethod || 'N/A'}

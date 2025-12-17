@@ -24,6 +24,9 @@ const ProductCard = ({ product, onAddToCart }) => {
             NPR {product.price}
           </span>
         </div>
+        <p className="text-xs text-orange-600 font-medium mb-1">
+          {product.restaurantId && typeof product.restaurantId === 'object' ? `Sold by: ${product.restaurantId.restaurantName || product.restaurantId.restaurantDetails?.restaurantName || 'Unknown'}` : ''}
+        </p>
         <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">{product.description}</p>
         <div className="flex justify-between items-center pt-2 border-t border-gray-50">
           <Link
@@ -36,8 +39,8 @@ const ProductCard = ({ product, onAddToCart }) => {
             onClick={() => onAddToCart(product)}
             disabled={!product.inStock}
             className={`px-4 py-2 rounded-md font-medium transition-colors ${product.inStock
-                ? 'bg-orange-600 text-white hover:bg-orange-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-orange-600 text-white hover:bg-orange-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
           >
             {product.inStock ? 'Add to Cart' : 'Unavailable'}

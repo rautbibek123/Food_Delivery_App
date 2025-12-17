@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
             query.$text = { $search: q };
         }
 
-        const products = await Product.find(query);
+        const products = await Product.find(query).populate('restaurantId');
         res.json(products);
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 // GET /api/products/:id
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate('restaurantId');
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
         res.json(product);

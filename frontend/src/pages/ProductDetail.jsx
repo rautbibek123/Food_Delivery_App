@@ -21,12 +21,23 @@ const ProductDetail = () => {
       setLoading(true);
       try {
         const productRes = await api.get(`/products/${id}`);
-        setProduct(productRes.data);
+        const productData = productRes.data;
+        setProduct(productData);
 
-        // Fetch Restaurant Details
-        if (productRes.data.restaurantId) {
-          const restRes = await api.get(`/public/restaurants/${productRes.data.restaurantId}`);
-          setRestaurant(restRes.data);
+        // Handle Restaurant Details (Populated or Separate Fetch)
+        if (productData.restaurantId) {
+          if (typeof productData.restaurantId === 'object') {
+            // Already populated via backend
+            setRestaurant(productData.restaurantId);
+          } else {
+            // Legacy/Fallback: Fetch if it's just an ID
+            try {
+              const restRes = await api.get(`/public/restaurants/${productData.restaurantId}`);
+              setRestaurant(restRes.data);
+            } catch (err) {
+              console.warn("Failed to fetch restaurant details", err);
+            }
+          }
         }
 
         // Fetch Product Reviews
@@ -62,7 +73,7 @@ const ProductDetail = () => {
     try {
       setSubmittingReview(true);
       const res = await api.post('/reviews', {
-        restaurantId: product.restaurantId,
+        restaurantId: product.restaurantId._id || product.restaurantId, // Handle both object and string
         productId: product._id,
         rating: newReview.rating,
         comment: newReview.comment
@@ -102,7 +113,7 @@ const ProductDetail = () => {
             {restaurant && (
               <Link to={`/restaurants/${restaurant._id}`} className="flex items-center gap-2 mt-2 text-gray-600 hover:text-orange-600 transition-colors">
                 <Store size={18} />
-                <span className="font-medium">Sold by: {restaurant.restaurantDetails?.restaurantName}</span>
+                <span className="font-medium">Sold by: {restaurant.restaurantName || restaurant.restaurantDetails?.restaurantName}</span>
               </Link>
             )}
 
