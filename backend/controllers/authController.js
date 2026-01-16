@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { generateToken, generateRandomToken, generateOTP } = require('../utils/tokenUtils');
-const { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail, sendPasswordResetConfirmation, sendEmailOTP } = require('../services/emailService');
+const { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail, sendPasswordResetConfirmation, sendEmailOTP } = require('./emailController');
 const { sendSMS } = require('../services/smsService');
 
 /**
