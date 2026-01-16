@@ -1,0 +1,720 @@
+{
+	"info": {
+		"_postman_id": "40662943-96d7-42dc-be12-5e03c9992b03",
+		"name": "Fooddelivery  test cases",
+		"description": "Comprehensive API testing collection for a restaurant/e-commerce platform. Includes endpoints for authentication, user management, products, orders, payments, addresses, receipts, restaurant operations, public access, coupons, reviews, and file uploads.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "51146919",
+		"_collection_link": "https://annuppoudel505-1073707.postman.co/workspace/Software-Testing~5e7ff524-8d78-4667-8cbf-6d28caacd194/collection/51146919-40662943-96d7-42dc-be12-5e03c9992b03?action=share&source=collection_link&creator=51146919"
+	},
+	"item": [
+		{
+			"name": "admin Users",
+			"item": [
+				{
+					"name": "get all users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"  pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://gorest.co.in/public/v2/users",
+							"protocol": "https",
+							"host": [
+								"gorest",
+								"co",
+								"in"
+							],
+							"path": [
+								"public",
+								"v2",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create users static",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 201\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test(\"Check response contains user ID\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"id\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "244391951198d878a25d5f1b587a8f0e7ccc5e5600c718ead0050ed913032184",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n        \"id\": 8114953,\n        \"name\": \"Anup Paudel\",\n        \"email\": \"anuppoudel6056test@gmail.com\",\n        \"gender\": \"male\",\n        \"status\": \"active\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://gorest.co.in/public/v2/users",
+							"protocol": "https",
+							"host": [
+								"gorest",
+								"co",
+								"in"
+							],
+							"path": [
+								"public",
+								"v2",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create users dynamic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 201\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test(\"Check response contains user ID\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"id\");",
+									"});",
+									"",
+									"pm.test(\"Check response contains valid status\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"status\");",
+									"    pm.expect(jsonData.status).to.be.oneOf([\"active\", \"inactive\"]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// ============================================",
+									"// PRE-REQUEST SCRIPT: Dynamic User Data Generation",
+									"// ============================================",
+									"",
+									"// This script dynamically generates unique name and email values",
+									"// for each request execution to avoid duplicate data issues.",
+									"",
+									"// --------------------------------------------",
+									"// Generate Unique Identifier",
+									"// --------------------------------------------",
+									"const timestamp = Date.now();",
+									"const randomNum = Math.floor(Math.random() * 10000);",
+									"",
+									"// --------------------------------------------",
+									"// Generate Dynamic Name",
+									"// --------------------------------------------",
+									"const firstNames = [\"Anup\", \"John\", \"Sarah\", \"Mike\", \"Emma\", \"David\", \"Lisa\", \"James\"];",
+									"const lastNames = [\"Paudel\", \"Smith\", \"Johnson\", \"Williams\", \"Brown\", \"Jones\", \"Davis\", \"Miller\"];",
+									"",
+									"const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];",
+									"const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];",
+									"const dynamicName = `${randomFirstName} ${randomLastName}`;",
+									"",
+									"// --------------------------------------------",
+									"// Generate Dynamic Email",
+									"// --------------------------------------------",
+									"const dynamicEmail = `${randomFirstName.toLowerCase()}${randomLastName.toLowerCase()}${timestamp}@gmail.com`;",
+									"",
+									"// --------------------------------------------",
+									"// Set Variables for Use in Request Body",
+									"// --------------------------------------------",
+									"pm.collectionVariables.set(\"dynamic_name\", dynamicName);",
+									"pm.collectionVariables.set(\"dynamic_email\", dynamicEmail);",
+									"",
+									"// --------------------------------------------",
+									"// Log Generated Values",
+									"// --------------------------------------------",
+									"console.log(\"========================================\");",
+									"console.log(\"Dynamic User Data Generated:\");",
+									"console.log(\"Name:\", dynamicName);",
+									"console.log(\"Email:\", dynamicEmail);",
+									"console.log(\"========================================\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "244391951198d878a25d5f1b587a8f0e7ccc5e5600c718ead0050ed913032184",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{dynamic_name}}\",\n    \"email\": \"{{dynamic_email}}\",\n    \"gender\": \"male\",\n    \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://gorest.co.in/public/v2/users",
+							"protocol": "https",
+							"host": [
+								"gorest",
+								"co",
+								"in"
+							],
+							"path": [
+								"public",
+								"v2",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "get all products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"  pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://gorest.co.in/public/v2/users/7733534/posts",
+							"protocol": "https",
+							"host": [
+								"gorest",
+								"co",
+								"in"
+							],
+							"path": [
+								"public",
+								"v2",
+								"users",
+								"7733534",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "new products static",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Status code is 200 or 201\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test(\"Check response contains user ID\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"id\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "f738539fe62780884ef024775f0f285dab516fb00c40138a5a48a42dfd711a12",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    { \n        \"user_id\": 7733534,\n        \"products\": \"his is the statically created product name called hello world\",\n        \"biscription\": \"this product will be there to make the taste of your mouth full of water\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://gorest.co.in/public/v2/users/7733534/posts",
+							"protocol": "https",
+							"host": [
+								"gorest",
+								"co",
+								"in"
+							],
+							"path": [
+								"public",
+								"v2",
+								"users",
+								"7733534",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "GET - Orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test('Response time is acceptable (under 2000ms)', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"})",
+									"",
+									"pm.test('Content-Type header is application/json', function () {",
+									"    pm.response.to.have.header('Content-Type');",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+									"})",
+									"",
+									"pm.test('Response body is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"})",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"})",
+									"",
+									"pm.test('Orders contain expected fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        jsonData.forEach(function (order) {",
+									"            pm.expect(order).to.have.property('id');",
+									"            pm.expect(order).to.have.property('customer_id');",
+									"            pm.expect(order).to.have.property('restaurant_id');",
+									"            pm.expect(order).to.have.property('items');",
+									"            pm.expect(order).to.have.property('total_amount');",
+									"            pm.expect(order).to.have.property('status');",
+									"        });",
+									"    }",
+									"})",
+									"",
+									"pm.test('Orders have correct data types', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        jsonData.forEach(function (order) {",
+									"            pm.expect(order.id).to.be.a('number');",
+									"            pm.expect(order.customer_id).to.be.a('number');",
+									"            pm.expect(order.restaurant_id).to.be.a('number');",
+									"            pm.expect(order.items).to.be.an('array');",
+									"            pm.expect(order.total_amount).to.be.a('number');",
+									"            pm.expect(order.status).to.be.a('string');",
+									"        });",
+									"    }",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "GET request to retrieve order details with comprehensive test validations"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 or 200', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([",
+									"        200,",
+									"        201",
+									"    ]);",
+									"})",
+									"",
+									"pm.test('Response time is acceptable (under 2000ms)', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"})",
+									"",
+									"pm.test('Content-Type header is application/json', function () {",
+									"    pm.response.to.have.header('Content-Type');",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+									"})",
+									"",
+									"pm.test('Response body is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"})",
+									"",
+									"pm.test('Created order contains an ID', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.id).to.not.be.null;",
+									"})",
+									"",
+									"pm.test('Created order contains required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('customer_id');",
+									"    pm.expect(jsonData).to.have.property('restaurant_id');",
+									"    pm.expect(jsonData).to.have.property('items');",
+									"    pm.expect(jsonData).to.have.property('total_amount');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"})",
+									"",
+									"pm.test('Created order matches request data', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const requestData = JSON.parse(pm.request.body.raw);",
+									"    pm.expect(jsonData.customer_id).to.eql(requestData.customer_id);",
+									"    pm.expect(jsonData.restaurant_id).to.eql(requestData.restaurant_id);",
+									"    pm.expect(jsonData.items).to.deep.eql(requestData.items);",
+									"})",
+									"",
+									"pm.test('Created order has correct data types', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.be.a('number');",
+									"    pm.expect(jsonData.customer_id).to.be.a('number');",
+									"    pm.expect(jsonData.restaurant_id).to.be.a('number');",
+									"    pm.expect(jsonData.items).to.be.an('array');",
+									"    pm.expect(jsonData.total_amount).to.be.a('number');",
+									"    pm.expect(jsonData.status).to.be.a('string');",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"customer_id\": 1, \"items\": [{\"product_id\": 1, \"quantity\": 2}], \"total_amount\": 50.00, \"status\": \"pending\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "POST request to create a new order with comprehensive test validations"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restaurant",
+			"item": [
+				{
+					"name": "GET - Restaurants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/restaurants?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "GET request to retrieve restaurant details with comprehensive test validations"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Restaurants",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Pizza Palace\", \"address\": \"123 Main St\", \"cuisine\": \"Italian\", \"rating\": 4.5, \"phone\": \"555-1234\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/restaurants",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"restaurants"
+							]
+						},
+						"description": "POST request to create a new restaurant with comprehensive test validations"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Coupons",
+			"item": [
+				{
+					"name": "GET - Coupons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/coupons?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "GET request to retrieve coupon details with comprehensive test validations"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Coupons",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"code\": \"SAVE20\", \"discount_percent\": 20, \"valid_from\": \"2024-01-01\", \"valid_until\": \"2024-12-31\", \"max_uses\": 100}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/coupons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons"
+							]
+						},
+						"description": "POST request to create a new coupon with comprehensive test validations"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Upload",
+			"item": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "apiKey",
+			"value": ""
+		},
+		{
+			"key": "dynamic_name",
+			"value": ""
+		},
+		{
+			"key": "dynamic_email",
+			"value": ""
+		},
+		{
+			"key": "dynamic_title",
+			"value": ""
+		},
+		{
+			"key": "dynamic_body",
+			"value": ""
+		}
+	]
+}
