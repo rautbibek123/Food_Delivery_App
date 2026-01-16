@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const User = require('../models/User');
 
 // Create transporter
 const createTransporter = () => {
@@ -311,10 +312,34 @@ const sendEmailOTP = async (email, name, otp) => {
     }
 };
 
+// Controller method for verifying email with token (migrated from auth routes)
+const verifyEmailWithToken = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const user = await User.findOne({ verificationToken: token });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired verification token' });
+        }
+
+        user.emailVerified = true;
+        user.verificationToken = undefined;
+        await user.save();
+
+        await sendWelcomeEmail(user.email, user.name);
+
+        res.json({ message: 'Email verified successfully! You can now log in.' });
+    } catch (err) {
+        console.error('Email verification error:', err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     sendVerificationEmail,
     sendPasswordResetEmail,
     sendWelcomeEmail,
     sendPasswordResetConfirmation,
-    sendEmailOTP
+    sendEmailOTP,
+    verifyEmailWithToken
 };
