@@ -159,10 +159,19 @@ router.put('/users/:id', auth, adminAuth, async (req, res) => {
 // GET /api/admin/restaurants - Get all restaurants
 router.get('/restaurants', auth, adminAuth, async (req, res) => {
     try {
-        const restaurants = await User.find({ role: 'restaurant' })
+        const users = await User.find({ role: 'restaurant' })
             .select('-passwordHash')
             .sort({ createdAt: -1 });
-        res.json(restaurants);
+
+        const restaurantsWithIds = await Promise.all(users.map(async (user) => {
+            const restaurant = await Restaurant.findOne({ userId: user._id });
+            return {
+                ...user.toObject(),
+                restaurantDocId: restaurant ? restaurant._id : null
+            };
+        }));
+
+        res.json(restaurantsWithIds);
     } catch (err) {
         res.status(500).json({ message: 'Server Error', error: err.message });
     }

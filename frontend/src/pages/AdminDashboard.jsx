@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     // Form State
     const [newProduct, setNewProduct] = useState({
         name: '',
-        restaurantId: 'res_nepal_1',
+        restaurantId: '',
         description: '',
         price: '',
         image: '',
@@ -129,14 +129,6 @@ const AdminDashboard = () => {
 
             if (errors.length > 0) {
                 console.error('Dashboard fetch errors:', errors);
-                // setError(errors.join(', ')); // Optional: keep or remove based on preference, but user asked to remove "messages" so I'll revert to just console logging or minimal internal state if original had it.
-                // The original code in step 116 had `setError(errors.join(', '))` inside `if (errors.length > 0)`.
-                // But initially before my changes it was just console.error. 
-                // Wait, searching back to "viewed_file" of AdminDashboard in step 94 (Code Interaction Summary), it says: 
-                // "error handling for rejected promises was only logging to the console".
-                // So I should probably remove the `setError` call if I want to match original "silent" behavior, 
-                // BUT having some error state is good. The user said "remove all logs and messages". 
-                // I will keep the `console.error` but remove the UI display.
             }
 
         } catch (err) {
@@ -147,13 +139,14 @@ const AdminDashboard = () => {
         }
     };
 
-    // Create restaurant mapping for display
+    // Create restaurant mapping for display (Maps Restaurant Document ID -> Name)
     const restaurantMap = useMemo(() => {
         const map = {};
         restaurants.forEach(r => {
             const name = r.restaurantDetails?.restaurantName || r.restaurantName;
-            if (name) {
-                map[r._id] = name;
+            // Use restaurantDocId if available (for Products/Orders), fallback to _id if needed or ignore
+            if (name && r.restaurantDocId) {
+                map[r.restaurantDocId] = name;
             }
         });
         return map;
@@ -300,14 +293,20 @@ const AdminDashboard = () => {
     };
 
     const exportProducts = () => {
-        const exportData = filteredProducts.map(p => ({
-            Name: p.name,
-            Restaurant: restaurantMap[p.restaurantId] || 'Unknown',
-            Price: p.price,
-            Category: p.cuisine,
-            Categories: Array.isArray(p.categories) ? p.categories.join('; ') : '',
-            Tags: Array.isArray(p.tags) ? p.tags.join('; ') : ''
-        }));
+        const exportData = filteredProducts.map(p => {
+            const restaurantName = typeof p.restaurantId === 'object' && p.restaurantId !== null
+                ? (p.restaurantId.restaurantName || p.restaurantId.restaurantDetails?.restaurantName || 'Unknown')
+                : (restaurantMap[p.restaurantId] || 'Unknown');
+
+            return {
+                Name: p.name,
+                Restaurant: restaurantName,
+                Price: p.price,
+                Category: p.cuisine,
+                Categories: Array.isArray(p.categories) ? p.categories.join('; ') : '',
+                Tags: Array.isArray(p.tags) ? p.tags.join('; ') : ''
+            };
+        });
         exportToCSV(exportData, 'products');
     };
 
@@ -335,7 +334,7 @@ const AdminDashboard = () => {
             };
             await api.post('/admin/products', payload);
             alert('Product Created!');
-            setNewProduct({ name: '', restaurantId: 'res_nepal_1', description: '', price: '', image: '', categories: '', tags: '', cuisine: '' });
+            setNewProduct({ name: '', restaurantId: '', description: '', price: '', image: '', categories: '', tags: '', cuisine: '' });
             fetchData();
         } catch (err) {
             alert('Error creating product');
@@ -347,6 +346,7 @@ const AdminDashboard = () => {
         try {
             const payload = {
                 ...editingProduct,
+                restaurantId: editingProduct.restaurantId?._id || editingProduct.restaurantId,
                 categories: typeof editingProduct.categories === 'string' ? editingProduct.categories.split(',') : editingProduct.categories,
                 tags: typeof editingProduct.tags === 'string' ? editingProduct.tags.split(',') : editingProduct.tags,
                 price: Number(editingProduct.price)
@@ -790,29 +790,35 @@ const AdminDashboard = () => {
                                             </td>
                                         </tr>
                                     ) : (
-                                        paginatedProducts.map(p => (
-                                            <tr key={p._id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 flex items-center gap-3">
-                                                    <img src={p.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                                                    <span className="font-medium text-gray-900">{p.name}</span>
-                                                </td>
-                                                <td className="px-6 py-4 text-gray-600">
-                                                    <span className="text-sm">{restaurantMap[p.restaurantId] || 'Unknown'}</span>
-                                                </td>
-                                                <td className="px-6 py-4 text-gray-600">NPR {p.price}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">{p.cuisine}</span>
-                                                </td>
-                                                <td className="px-6 py-4 flex gap-2">
-                                                    <button onClick={() => setEditingProduct(p)} className="text-blue-500 hover:text-blue-700">
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                    <button onClick={() => handleDeleteProduct(p._id)} className="text-red-500 hover:text-red-700">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        paginatedProducts.map(p => {
+                                            const restaurantName = typeof p.restaurantId === 'object' && p.restaurantId !== null
+                                                ? (p.restaurantId.restaurantName || p.restaurantId.restaurantDetails?.restaurantName || 'Unknown')
+                                                : (restaurantMap[p.restaurantId] || 'Unknown');
+
+                                            return (
+                                                <tr key={p._id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 flex items-center gap-3">
+                                                        <img src={p.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                                                        <span className="font-medium text-gray-900">{p.name}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-gray-600">
+                                                        <span className="text-sm">{restaurantName}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-gray-600">NPR {p.price}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">{p.cuisine}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 flex gap-2">
+                                                        <button onClick={() => setEditingProduct(p)} className="text-blue-500 hover:text-blue-700">
+                                                            <Edit2 className="w-4 h-4" />
+                                                        </button>
+                                                        <button onClick={() => handleDeleteProduct(p._id)} className="text-red-500 hover:text-red-700">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     )}
                                 </tbody>
                             </table>
@@ -915,7 +921,7 @@ const AdminDashboard = () => {
                                                     >
                                                         <option value="">Select Restaurant</option>
                                                         {restaurants.map(r => (
-                                                            <option key={r._id} value={r._id}>
+                                                            <option key={r._id} value={r.restaurantDocId || ''}>
                                                                 {r.restaurantDetails?.restaurantName || 'Unnamed'}
                                                             </option>
                                                         ))}
@@ -1040,7 +1046,7 @@ const AdminDashboard = () => {
                                         >
                                             <option value="">Select Restaurant</option>
                                             {restaurants.map(r => (
-                                                <option key={r._id} value={r._id}>
+                                                <option key={r._id} value={r.restaurantDocId || ''}>
                                                     {r.restaurantDetails?.restaurantName || 'Unnamed'}
                                                 </option>
                                             ))}
